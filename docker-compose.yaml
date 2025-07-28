@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: email_auto_reply_web
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - db
+      - qdrant
+    volumes:
+      - ./app:/app
+
+  celery_worker:
+    build: .
+    container_name: email_auto_reply_worker
+    env_file: .env
+    command: celery -A app.tasks.email_processor worker --loglevel=info
+    depends_on:
+      - redis
+      - db
+      - qdrant
+    volumes:
+      - ./app:/app
+
+  redis:
+    image: redis:7
+    container_name: email_auto_reply_redis
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:15
+    container_name: email_auto_reply_postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: emaildb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: email_auto_reply_qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  pgdata:
+  qdrant_data:
