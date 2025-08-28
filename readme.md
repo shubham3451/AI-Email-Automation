@@ -1,4 +1,3 @@
-````markdown
 # 🤖 AI Auto Email Reply System
 
 An intelligent, context-aware email reply system that automatically responds to customer emails using Large Language Models (LLMs), vector search over internal documents, and prior thread context.
